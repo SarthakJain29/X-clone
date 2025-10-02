@@ -56,7 +56,7 @@ export default function Home() {
                 </li>
               ))}
             </ul>
-            <button className="bg-white text-black p-2 text-base rounded-full w-4/5 mt-5">Post</button>
+            <button className="bg-white text-black p-2 text-base rounded-full w-4/5 mt-5">Tweet</button>
           </div>
           
         </div>
