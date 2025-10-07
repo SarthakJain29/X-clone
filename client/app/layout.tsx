@@ -1,5 +1,7 @@
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import "./globals.css";
 
 // Use Inter instead of Geist
@@ -21,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased`}>
-        {children}
+        <GoogleOAuthProvider clientId="782621480711-74p66egtbpkbehp27kuenukod2a78cfb.apps.googleusercontent.com">
+          {children}
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

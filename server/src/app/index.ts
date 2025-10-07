@@ -3,18 +3,22 @@
 import express from 'express';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express5';
+import { User } from "./user"
+
 
 export async function initServer(){
     const app = express();  //new Express app which will handle incoming HTTP requests.
     const graphqlServer = new ApolloServer({
         typeDefs: `
+            ${User.types}
+
             type Query{
-                sayHello: String
+                 ${User.queries}
             }
         `,
         resolvers: {
             Query: {
-                sayHello: () => "Hello from Graphql server",
+                ...User.resolvers.queries
             },
         },
     });

@@ -17,19 +17,20 @@ exports.initServer = initServer;
 const express_1 = __importDefault(require("express"));
 const server_1 = require("@apollo/server");
 const express5_1 = require("@as-integrations/express5");
+const user_1 = require("./user");
 function initServer() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = (0, express_1.default)(); //new Express app which will handle incoming HTTP requests.
         const graphqlServer = new server_1.ApolloServer({
             typeDefs: `
+            ${user_1.User.types}
+
             type Query{
-                sayHello: String
+                 ${user_1.User.queries}
             }
         `,
             resolvers: {
-                Query: {
-                    sayHello: () => "Hello from Graphql server",
-                },
+                Query: Object.assign({}, user_1.User.resolvers.queries),
             },
         });
         yield graphqlServer.start(); //starting apollo server
