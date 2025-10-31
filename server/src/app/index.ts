@@ -2,12 +2,17 @@
 
 import express from 'express';
 import { ApolloServer } from '@apollo/server';
+import bodyParser from 'body-parser';
+import cors from 'cors';
 import { expressMiddleware } from '@as-integrations/express5';
 import { User } from "./user"
 
 
 export async function initServer(){
     const app = express();  //new Express app which will handle incoming HTTP requests.
+    app.use(bodyParser.json());
+    app.use(cors());
+
     const graphqlServer = new ApolloServer({
         typeDefs: `
             ${User.types}

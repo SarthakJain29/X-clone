@@ -1,13 +1,16 @@
-'use client';
+"use client";
 
 import { BsBell, BsBookmark, BsEnvelope, BsTwitter } from "react-icons/bs";
 import { BiHomeCircle, BiUser, BiSearch } from "react-icons/bi";
 import { GiSpaceSuit } from "react-icons/gi";
 import { MdGroups } from "react-icons/md";
 import { CiCircleMore } from "react-icons/ci";
-import React from "react";
-import FeedCard from "./FeedCard";
-import { GoogleLogin } from "@react-oauth/google";
+import React, { useCallback } from "react";
+import FeedCard from "../components/FeedCard";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import toast from "react-hot-toast";
+import { graphqlClient } from "@/clients/api";
+import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 
 interface TwitterSidebarButton {
   title: string;
@@ -17,43 +20,66 @@ interface TwitterSidebarButton {
 const sidebarItems: TwitterSidebarButton[] = [
   {
     title: "Home",
-    icon: <BiHomeCircle/>
+    icon: <BiHomeCircle />,
   },
   {
     title: "Explore",
-    icon: <BiSearch/>
+    icon: <BiSearch />,
   },
   {
     title: "Notifications",
-    icon: <BsBell/>
+    icon: <BsBell />,
   },
   {
     title: "Messages",
-    icon: <BsEnvelope/>
+    icon: <BsEnvelope />,
   },
   {
     title: "Grok",
-    icon: <GiSpaceSuit/>
+    icon: <GiSpaceSuit />,
   },
   {
     title: "Communities",
-    icon: <MdGroups/>
+    icon: <MdGroups />,
   },
   {
     title: "Bookmarks",
-    icon: <BsBookmark/>
+    icon: <BsBookmark />,
   },
   {
     title: "Profile",
-    icon: <BiUser/>
+    icon: <BiUser />,
   },
   {
     title: "More",
-    icon: <CiCircleMore/>
-  }
-]
+    icon: <CiCircleMore />,
+  },
+];
 
 export default function Home() {
+  const handleLoginWithGoogle = useCallback(
+  async (cred: CredentialResponse): Promise<void> => {
+    const googleToken = cred.credential;
+    if (!googleToken) {
+      toast.error("Google token not found");
+      return;
+    }
+
+    const { verifyGoogleToken } = await graphqlClient.request(
+      verifyUserGoogleTokenQuery,
+      { token: googleToken }
+    );
+
+    toast.success("verified success");
+    console.log(verifyGoogleToken);
+
+    if (verifyGoogleToken) window.localStorage.setItem("token", verifyGoogleToken);
+  },
+  []
+);
+
+
+
   return (
     <div>
       <div className="grid grid-cols-12 h-screen w-screen px-32">
@@ -68,31 +94,33 @@ export default function Home() {
                   key={item.title}
                   className="flex justify-start items-center gap-4 hover:bg-gray-800 rounded-full px-5 py-2 w-fit mt-2 cursor-pointer transition-all"
                 >
-                  <span>{item.icon}</span><span>{item.title}</span>
+                  <span>{item.icon}</span>
+                  <span>{item.title}</span>
                 </li>
               ))}
             </ul>
-            <button className="bg-white text-gray-900 py-3  text-base rounded-full w-4/5 mt-3 hover:bg-gray-400 cursor-pointer transition-all">Tweet</button>
+            <button className="bg-white text-gray-900 py-3  text-base rounded-full w-4/5 mt-3 hover:bg-gray-400 cursor-pointer transition-all">
+              Tweet
+            </button>
           </div>
-          
         </div>
         <div className="col-span-5 border-r-[1px] border-l-[1px] border-gray-800 h-screen overflow-scroll hide-scrollbar">
-            <FeedCard/>
-            <FeedCard/>
-            <FeedCard/>
-            <FeedCard/>
-            <FeedCard/>
-            <FeedCard/>
-            <FeedCard/>
-            <FeedCard/>
-            <FeedCard/>
-            <FeedCard/>
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
         </div>
         <div className="p-5 col-span-3">
           <div className="p-5 bg-slate-700 rounded-lg">
-              <h1 className="my-2 text-2xl">New to X?</h1>
-              <GoogleLogin onSuccess={(cred) => console.log(cred)}/>
-          </div>  
+            <h1 className="my-2 text-2xl">New to X?</h1>
+            <GoogleLogin onSuccess={handleLoginWithGoogle} />
+          </div>
         </div>
       </div>
     </div>
