@@ -20,6 +20,7 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const express5_1 = require("@as-integrations/express5");
 const user_1 = require("./user");
+const jwt_1 = __importDefault(require("../services/jwt"));
 function initServer() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = (0, express_1.default)(); //new Express app which will handle incoming HTTP requests.
@@ -38,7 +39,16 @@ function initServer() {
             },
         });
         yield graphqlServer.start(); //starting apollo server
-        app.use("/graphql", express_1.default.json(), (0, express5_1.expressMiddleware)(graphqlServer));
+        app.use("/graphql", express_1.default.json(), (0, express5_1.expressMiddleware)(graphqlServer, {
+            context: (_a) => __awaiter(this, [_a], void 0, function* ({ req }) {
+                var _b;
+                const authHeader = (_b = req.headers.authorization) === null || _b === void 0 ? void 0 : _b.split('Bearer ')[1];
+                const user = authHeader
+                    ? jwt_1.default.decodeToken(authHeader)
+                    : null;
+                return { user };
+            })
+        }));
         //This connects Apollo Server to the Express app under the /graphql route.
         return app;
     });

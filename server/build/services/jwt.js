@@ -16,5 +16,17 @@ class JWTService {
         const token = jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET);
         return token;
     }
+    static decodeToken(token) {
+        if (!token)
+            return null; // handle undefined token safely
+        try {
+            const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+            return decoded;
+        }
+        catch (error) {
+            console.error("Invalid token:", error);
+            return null;
+        }
+    }
 }
 exports.default = JWTService;
