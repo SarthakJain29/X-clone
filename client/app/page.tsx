@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { BsBell, BsBookmark, BsEnvelope, BsTwitter } from "react-icons/bs";
-import { BiHomeCircle, BiUser, BiSearch } from "react-icons/bi";
+import { BiImageAlt, BiHomeCircle, BiUser, BiSearch } from "react-icons/bi";
 import { GiSpaceSuit } from "react-icons/gi";
 import { MdGroups } from "react-icons/md";
 import { CiCircleMore } from "react-icons/ci";
@@ -60,7 +61,6 @@ const sidebarItems: TwitterSidebarButton[] = [
 
 export default function Home() {
   const { user } = useCurrentUser();
-  console.log(user);
   const queryClient = useQueryClient();
 
   const handleLoginWithGoogle = useCallback(
@@ -86,6 +86,13 @@ export default function Home() {
     },
     [queryClient]
   );
+
+  const handleSelectImage = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*")
+    input.click();
+  }, []);
 
   return (
     <div>
@@ -130,6 +137,36 @@ export default function Home() {
           </div>
         )}
         <div className="col-span-5 border-r-[1px] border-l-[1px] border-gray-800 h-screen overflow-scroll hide-scrollbar">
+          <div>
+            <div className="border border-l-0 border-r-0 border-b-0 border-gray-800 p-5 hover:bg-slate-900 transition-all cursor-pointer">
+              <div className="grid grid-cols-12">
+                <div className="col-span-1">
+                  {user?.profileImageURL && (
+                    <Image
+                      className="rounded-full"
+                      src={user?.profileImageURL}
+                      alt="user-img"
+                      height={50}
+                      width={50}
+                    />
+                  )}
+                </div>
+                <div className="col-span-11">
+                  <textarea
+                    className="w-full bg-transparent text-xl px-3 border-b border-slate-700"
+                    placeholder="Whats happening?"
+                    rows={3}
+                  ></textarea>
+                  <div className="mt-2 flex justify-between items-center">
+                    <BiImageAlt onClick= {handleSelectImage} className="text-cl" />
+                    <button className="bg-white text-gray-900 font-semibold text-sm py-2 px-4 rounded-full">
+                      Tweet
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <FeedCard />
           <FeedCard />
           <FeedCard />
