@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/(.*)", // apply to all routes
+        source: "/(.*)",
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",
@@ -17,6 +17,15 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
+  },
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com", // Allow Google profile images
+      },
+    ],
   },
 };
 

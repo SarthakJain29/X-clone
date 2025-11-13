@@ -6,7 +6,7 @@ import { BiImageAlt, BiHomeCircle, BiUser, BiSearch } from "react-icons/bi";
 import { GiSpaceSuit } from "react-icons/gi";
 import { MdGroups } from "react-icons/md";
 import { CiCircleMore } from "react-icons/ci";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import FeedCard from "../components/FeedCard";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
@@ -14,6 +14,8 @@ import { graphqlClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
+import { Tweet } from "@/gql/graphql";
 
 interface TwitterSidebarButton {
   title: string;
@@ -61,7 +63,10 @@ const sidebarItems: TwitterSidebarButton[] = [
 
 export default function Home() {
   const { user } = useCurrentUser();
+  const { tweets = [] } = useGetAllTweets();
   const queryClient = useQueryClient();
+  const {mutate} = useCreateTweet();
+  const [content, setContent] = useState('');
 
   const handleLoginWithGoogle = useCallback(
     async (cred: CredentialResponse): Promise<void> => {
@@ -93,6 +98,12 @@ export default function Home() {
     input.setAttribute("accept", "image/*")
     input.click();
   }, []);
+
+  const handleCreateTweet = useCallback(() =>{
+    mutate({
+      content,
+    });
+  }, [])
 
   return (
     <div>
@@ -153,13 +164,14 @@ export default function Home() {
                 </div>
                 <div className="col-span-11">
                   <textarea
+                    value={content} onChange={e => setContent(e.target.value)}
                     className="w-full bg-transparent text-xl px-3 border-b border-slate-700"
                     placeholder="Whats happening?"
                     rows={3}
                   ></textarea>
                   <div className="mt-2 flex justify-between items-center">
                     <BiImageAlt onClick= {handleSelectImage} className="text-cl" />
-                    <button className="bg-white text-gray-900 font-semibold text-sm py-2 px-4 rounded-full">
+                    <button onClick={handleCreateTweet} className="bg-white text-gray-900 font-semibold text-sm py-2 px-4 rounded-full">
                       Tweet
                     </button>
                   </div>
@@ -167,16 +179,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
+          {tweets?.map(tweet => tweet ? <FeedCard key={tweet?.id} data={tweet as Tweet} /> : null)}
         </div>
         <div className="p-5 col-span-3">
           {!user && (
